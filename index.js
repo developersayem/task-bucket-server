@@ -34,6 +34,62 @@ async function mongoDbRun() {
             const tasks = await cursor.toArray();
             res.send(tasks);
         });
+        //TASK CREATE ONE  OPARATION
+        app.post("/task", async (req, res) => {
+            const data = req.body;
+            const task = await tasksCollections.insertOne(data);
+            res.send(task);
+        });
+        // TASKS READ_BY_EMAIL_OPERATION 
+        app.get("/mytasks", async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    "email": req.query.email
+                }
+            }
+            const cursor = tasksCollections.find(query);
+            const tasks = await cursor.toArray();
+            res.send(tasks);
+        });
+        // TASKS READ_BY_EMAIL_OPERATION 
+        app.get("/priority", async (req, res) => {
+            const query = { priority: 'high' };
+            const cursor = tasksCollections.find(query);
+            const tasks = await cursor.toArray();
+            res.send(tasks);
+        });
+        // TASKS READ_BY_EMAIL_OPERATION 
+        app.get("/taskType", async (req, res) => {
+            const query = { taskType: 'complete' };
+            const cursor = tasksCollections.find(query);
+            const tasks = await cursor.toArray();
+            res.send(tasks);
+        });
+        // REVIEW_DELETE_OPARATION(D)
+        app.delete("/mytask/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const task = await tasksCollections.deleteOne(query);
+            res.send(task);
+        });
+        app.put("/mytaskid/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const review = req.body;
+            const option = { upinsert: true };
+            const updatedUser = {
+                $set: {
+                    taskType: 'complete',
+                },
+            };
+            const result = await reviewsCollection.updateOne(
+                filter,
+                updatedUser,
+                option
+            );
+            res.send(result);
+        });
 
     } finally { }
 } mongoDbRun().catch((err) => console.error(err));
